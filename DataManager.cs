@@ -37,7 +37,7 @@ namespace FileDataInputOutput
 
         public void Append(String name, String subAddress, String[] data)
         {
-
+            Console.WriteLine("appends");
             List<String> datas = new List<string>();
             using (StreamReader reader = new StreamReader(Location))
             {
@@ -68,6 +68,7 @@ namespace FileDataInputOutput
         //Is Not Contains
         public void NewAddress(String name, String subAddress, String[] data)
         {
+            Console.WriteLine("New Address");
             using (StreamWriter writer = new StreamWriter(Location, true))
             {
                 writer.WriteLine(name + ":");

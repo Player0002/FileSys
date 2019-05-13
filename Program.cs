@@ -23,12 +23,12 @@ namespace FileDataInputOutput
         {
             if(!File.Exists(LOC)) File.Create(LOC).Close();
             dataManager = new DataManager(LOC);
-            dataManager.readAllAddress();
         }
 
         public void Write(String name, String subName, String[] data)
         {
-            if(!isIn(name, DataManager.listOfDatas))
+            dataManager.readAllAddress();
+            if (!isIn(name, DataManager.listOfDatas))
                 dataManager.NewAddress(name, subName, data);
             else dataManager.Append(name, subName, data);
         }
@@ -37,7 +37,7 @@ namespace FileDataInputOutput
         {
             foreach (String s in datas)
             {
-                if (s == name) return true;
+                if (s.Equals(name)) return true;
             }
 
             return false;
@@ -49,11 +49,11 @@ namespace FileDataInputOutput
         static void Main(string[] args)
         {
             FileData data = new FileData();
-            data.Write("Hello", "Bye", new string[3]{"Bye", "World", "Hello"});
+            data.Write("Hello", "Bye", new string[3]{"Test", "World", "Hello"});
 
             data.Write("Hell", "Bye", new string[3] { "Bye", "World", "Hello" });
 
-            data.Write("Hell", "asg", new string[3] { "Bye", "World", "Hello" });
+            data.Write("Hell", "asg", new string[3] { "BA", "World", "Hello" });
 
             foreach (String s in DataManager.listOfDatas)
             {
