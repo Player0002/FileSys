@@ -47,6 +47,10 @@ namespace FileDataInputOutput
 
             return false;
         }
+        public string[] ReadLine(string name, string SubAddress)
+        {
+            return dataManager.ReadLine(name, SubAddress);
+        }
     }
 
     class Program
@@ -60,6 +64,11 @@ namespace FileDataInputOutput
 
             data.Write("Hell", "asg", new string[3] { "BA", "World", "Hello" });
             data.Write("Hell", "asg", new string[3] {"BA", "SA", "AD"});
+
+            data.Write("Hello", "Bye", new string[4] {"Test", "Read", "fin", "Cute"});
+
+            data.Write("Hello", "Bye2", new string[3] { "Test", "World", "Hello" });
+            data.Write("Hello", "Bye2", new string[0]);
             //Console.WriteLine("List of ArrayList");
             foreach (String s in data.getManager().listOfDatas)
             {
@@ -74,6 +83,8 @@ namespace FileDataInputOutput
                     Console.WriteLine("\t" + str);
                 }
             }
+            Console.WriteLine("Hello -> Start");
+            foreach(string s in data.ReadLine("Hello", "Bye")) Console.WriteLine(s);
         }
     }
 }

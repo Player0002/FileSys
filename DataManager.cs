@@ -20,7 +20,42 @@ namespace FileDataInputOutput
         {
             this.Location = Location;
         }
+        public string[] ReadLine(string name, string SubAddress)
+        {
 
+            List<string> imsi = new List<string>();
+            using (StreamReader reader = new StreamReader(Location))
+            {
+                string current;
+
+                while ((current = reader.ReadLine()) != null)
+                {
+                    if (current.Equals(name + ":"))
+                    {
+                        while ((current = reader.ReadLine()) != null)
+                        {
+                            if (current.StartsWith("") && current.EndsWith(":")) break;
+                            if (current.Equals("\t-" + SubAddress))
+                            {
+                                while ((current = reader.ReadLine()) != null)
+                                {
+                                    if (current.StartsWith("") && current.EndsWith(":")) break;
+                                    if (current.StartsWith("\t-")) break;
+                                    imsi.Add(current.Replace("\t\t-", ""));
+                                }
+
+                                break;
+                            }
+                        }
+                        break;
+                    }
+
+                }
+            }
+
+            string[] array = imsi.ToArray();
+            return array;
+        }
         public void readAllSubs()
         {
             listOfSubData.Clear();
