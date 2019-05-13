@@ -22,6 +22,7 @@ namespace FileDataInputOutput
 
         public void readAllAddress()
         {
+            listOfDatas.Clear();
             using (StreamReader reader = new StreamReader(Location))
             {
                 string current;

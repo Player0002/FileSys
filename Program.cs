@@ -55,6 +55,7 @@ namespace FileDataInputOutput
 
             data.Write("Hell", "asg", new string[3] { "BA", "World", "Hello" });
 
+            Console.WriteLine("List of ArrayList");
             foreach (String s in DataManager.listOfDatas)
             {
                 Console.WriteLine(s);
