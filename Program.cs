@@ -25,10 +25,15 @@ namespace FileDataInputOutput
             dataManager = new DataManager(LOC);
         }
 
+        public DataManager getManager()
+        {
+            return this.dataManager;
+        }
         public void Write(String name, String subName, String[] data)
         {
             dataManager.readAllAddress();
-            if (!isIn(name, DataManager.listOfDatas))
+            dataManager.readAllSubs();
+            if (!isIn(name, dataManager.listOfDatas))
                 dataManager.NewAddress(name, subName, data);
             else dataManager.Append(name, subName, data);
         }
@@ -54,11 +59,20 @@ namespace FileDataInputOutput
             data.Write("Hell", "Bye", new string[3] { "Bye", "World", "Hello" });
 
             data.Write("Hell", "asg", new string[3] { "BA", "World", "Hello" });
-
-            Console.WriteLine("List of ArrayList");
-            foreach (String s in DataManager.listOfDatas)
+            data.Write("Hell", "asg", new string[3] {"BA", "SA", "AD"});
+            //Console.WriteLine("List of ArrayList");
+            foreach (String s in data.getManager().listOfDatas)
             {
-                Console.WriteLine(s);
+                //Console.WriteLine(s);
+            }
+            //Console.WriteLine("SUBS");
+            foreach (KeyValuePair<string, List<String>> s in data.getManager().listOfSubData)
+            {
+                Console.WriteLine(s.Key);
+                foreach (string str in s.Value)
+                {
+                    Console.WriteLine("\t" + str);
+                }
             }
         }
     }
