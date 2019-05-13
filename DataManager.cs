@@ -1,30 +1,25 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileDataInputOutput
 {
     class DataManager
     {
-        private String Location;
+        private readonly string _location;
 
-        public List<string> listOfDatas = new List<string>();
-        public Dictionary<string, List<string>> listOfSubData = new Dictionary<string, List<string>>();
-        public DataManager(String Location)
+        public List<string> ListOfDatas = new List<string>();
+        public Dictionary<string, List<string>> ListOfSubData = new Dictionary<string, List<string>>();
+        public DataManager(string location)
         {
-            this.Location = Location;
+            this._location = location;
         }
         public string[] ReadLine(string name, string SubAddress)
         {
 
-            List<string> imsi = new List<string>();
-            using (StreamReader reader = new StreamReader(Location))
+            var imsi = new List<string>();
+            using (var reader = new StreamReader(_location))
             {
                 string current;
 
@@ -53,73 +48,68 @@ namespace FileDataInputOutput
                 }
             }
 
-            string[] array = imsi.ToArray();
+            var array = imsi.ToArray();
             return array;
         }
-        public void readAllSubs()
+        public void ReadAllSubs()
         {
-            listOfSubData.Clear();
-            foreach (string name in listOfDatas)
+            ListOfSubData.Clear();
+            foreach (var name in ListOfDatas)
             {
-                //Console.WriteLine(name);
-                using (StreamReader reader = new StreamReader(Location))
+                using (var reader = new StreamReader(_location))
                 {
                     string current;
 
                     while ((current = reader.ReadLine()) != null)
                     {
-                        List<string> imsi = new List<string>();
-                        if (current.Equals(name + ":"))
+                        var imsi = new List<string>();
+                        if (!current.Equals(name + ":")) continue;
+                        while ((current = reader.ReadLine()) != null)
                         {
-                            while ((current = reader.ReadLine()) != null)
+                            if (current.StartsWith("") && current.EndsWith(":")) break;
+                            if (current.StartsWith("\t-"))
                             {
-                                if (current.StartsWith("") && current.EndsWith(":")) break;
-                                if (current.StartsWith("\t-"))
-                                {
-                                    imsi.Add(current.Replace("\t-", ""));
-                                }
+                                imsi.Add(current.Replace("\t-", ""));
                             }
-
-                            listOfSubData.Add(name, imsi);
-                            break;
                         }
+
+                        ListOfSubData.Add(name, imsi);
+                        break;
 
                     }
 
                 }
             }
         }
-        public void readAllAddress()
+        public void ReadAllAddress()
         {
-            listOfDatas.Clear();
-            using (StreamReader reader = new StreamReader(Location))
+            ListOfDatas.Clear();
+            using (var reader = new StreamReader(_location))
             {
                 string current;
                 while ((current = reader.ReadLine()) != null)
                 {
                     if (current.StartsWith("") && current.EndsWith(":"))
                     {
-                        listOfDatas.Add(current.Substring(0, current.Length -1));
+                        ListOfDatas.Add(current.Substring(0, current.Length -1));
                     }
                 }
             }
         }
 
-        public void MainAppend(String name, String subAddress, String[] data)
+        public void MainAppend(string name, string subAddress, string[] data)
         {
-            //Console.WriteLine("MainAppend");
-            List<String> datas = new List<string>();
-            using (StreamReader reader = new StreamReader(Location))
+            var datas = new List<string>();
+            using (var reader = new StreamReader(_location))
             {
-                String current;
+                string current;
                 while ((current = reader.ReadLine()) != null)
                 {
                     if (current.Equals(name + ":"))
                     {
                         datas.Add(name + ":");
                         datas.Add("\t-" + subAddress);
-                        foreach (string s in data)
-                            datas.Add("\t\t-" + s);
+                        datas.AddRange(data.Select(s => "\t\t-" + s));
                         while ((current = reader.ReadLine()) != null)
                         {
                             if (current.StartsWith("-") || current.StartsWith(""))
@@ -130,9 +120,9 @@ namespace FileDataInputOutput
                     datas.Add(current);
                 }
             }
-            using (StreamWriter writer = new StreamWriter(Location))
+            using (var writer = new StreamWriter(_location))
             {
-                foreach (String s in datas)
+                foreach (var s in datas)
                 {
                     writer.WriteLine(s);
                 }
@@ -141,19 +131,17 @@ namespace FileDataInputOutput
 
         public void SubAppend(string name, string subAddress, string[] data)
         {
-            Console.WriteLine("Sub Append");
-            List<String> datas = new List<string>();
-            using (StreamReader reader = new StreamReader(Location))
+            var datas = new List<string>();
+            using (StreamReader reader = new StreamReader(_location))
             {
-                String current;
+                string current;
                 while ((current = reader.ReadLine()) != null)
                 {
                     if (current.Equals(name + ":"))
                     {
                         datas.Add(name + ":");
                         datas.Add("\t-" + subAddress);
-                        foreach (string s in data)
-                            datas.Add("\t\t-" + s);
+                        datas.AddRange(data.Select(s => "\t\t-" + s));
                         while ((current = reader.ReadLine()) != null) {
                             if (current.Equals("\t-" + subAddress))
                             {
@@ -170,45 +158,36 @@ namespace FileDataInputOutput
                     datas.Add(current);
                 }
             }
-            using (StreamWriter writer = new StreamWriter(Location))
+            using (var writer = new StreamWriter(_location))
             {
-                foreach (String s in datas)
+                foreach (var s in datas)
                 {
                     writer.WriteLine(s);
                 }
             }
         }
-        public void Append(String name, String subAddress, String[] data)
+        public void Append(string name, string subAddress, string[] data)
         {
-            //Console.WriteLine("appends / isIn? : " + isIn(name, listOfSubData[name]));
-            if(!isIn(subAddress, listOfSubData[name])) MainAppend(name, subAddress, data);
+            if(!IsIn(subAddress, ListOfSubData[name])) MainAppend(name, subAddress, data);
             else SubAppend(name, subAddress, data);
         }
 
-        private bool isIn(String name, List<String> data)
+        private bool IsIn(string name, IEnumerable<string> data)
         {
-            Console.WriteLine("Name : " + name);
-            foreach (KeyValuePair<string, List<String>> s in listOfSubData)
+            foreach (var s in ListOfSubData)
             {
-                Console.WriteLine("Key : " + s.Key);
-                foreach(String str in s.Value) Console.WriteLine("\t" + str);
-            }
-            foreach (string s in data)
-            {
-                if (s == name) return true;
+                foreach(var str in s.Value) Console.WriteLine("\t" + str);
             }
 
-            return false;
+            return data.Any(s => s == name);
         }
-        //Is Not Contains
-        public void NewAddress(String name, String subAddress, String[] data)
+        public void NewAddress(string name, string subAddress, string[] data)
         {
-            //Console.WriteLine("New Address");
-            using (StreamWriter writer = new StreamWriter(Location, true))
+            using (var writer = new StreamWriter(_location, true))
             {
                 writer.WriteLine(name + ":");
                 writer.WriteLine("\t-" + subAddress);
-                foreach (string s in data)
+                foreach (var s in data)
                 {
                     writer.WriteLine("\t\t-" + s);
                 }

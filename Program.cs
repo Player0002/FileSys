@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Common;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SqlServer.Server;
 
 namespace FileDataInputOutput
 {
@@ -15,32 +8,33 @@ namespace FileDataInputOutput
     {
         private readonly string LOC = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FileD.dat";
 
-        private DataManager dataManager;
+        private readonly DataManager _dataManager;
         /*
          * initialization
          */
         public FileData()
         {
             if(!File.Exists(LOC)) File.Create(LOC).Close();
-            dataManager = new DataManager(LOC);
+            _dataManager = new DataManager(LOC);
         }
 
-        public DataManager getManager()
+        public DataManager GetManager()
         {
-            return this.dataManager;
+            return this._dataManager;
         }
-        public void Write(String name, String subName, String[] data)
+        public void Write(string name, string subName, string[] data)
         {
-            dataManager.readAllAddress();
-            dataManager.readAllSubs();
-            if (!isIn(name, dataManager.listOfDatas))
-                dataManager.NewAddress(name, subName, data);
-            else dataManager.Append(name, subName, data);
+            _dataManager.ReadAllAddress();
+            _dataManager.ReadAllSubs();
+            if (!IsIn(name, _dataManager.ListOfDatas))
+                _dataManager.NewAddress(name, subName, data);
+            else _dataManager.Append(name, subName, data);
         }
 
-        private bool isIn(string name, List<String> datas)
+        private bool IsIn(string name, IReadOnlyCollection<string> Data)
         {
-            foreach (String s in datas)
+            if (Data == null) return false;
+            foreach (var s in Data)
             {
                 if (s.Equals(name)) return true;
             }
@@ -49,7 +43,7 @@ namespace FileDataInputOutput
         }
         public string[] ReadLine(string name, string SubAddress)
         {
-            return dataManager.ReadLine(name, SubAddress);
+            return _dataManager.ReadLine(name, SubAddress);
         }
     }
 
@@ -57,7 +51,7 @@ namespace FileDataInputOutput
     {
         static void Main(string[] args)
         {
-            FileData data = new FileData();
+            var data = new FileData();
             data.Write("Hello", "Bye", new string[3]{"Test", "World", "Hello"});
 
             data.Write("Hell", "Bye", new string[3] { "Bye", "World", "Hello" });
@@ -69,22 +63,7 @@ namespace FileDataInputOutput
 
             data.Write("Hello", "Bye2", new string[3] { "Test", "World", "Hello" });
             data.Write("Hello", "Bye2", new string[0]);
-            //Console.WriteLine("List of ArrayList");
-            foreach (String s in data.getManager().listOfDatas)
-            {
-                //Console.WriteLine(s);
-            }
-            //Console.WriteLine("SUBS");
-            foreach (KeyValuePair<string, List<String>> s in data.getManager().listOfSubData)
-            {
-                Console.WriteLine(s.Key);
-                foreach (string str in s.Value)
-                {
-                    Console.WriteLine("\t" + str);
-                }
-            }
-            Console.WriteLine("Hello -> Start");
-            foreach(string s in data.ReadLine("Hello", "Bye")) Console.WriteLine(s);
+
         }
     }
 }
