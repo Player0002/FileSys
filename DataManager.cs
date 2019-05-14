@@ -11,11 +11,11 @@ namespace FileDataInputOutput
 
         public List<string> ListOfDatas = new List<string>();
         public Dictionary<string, List<string>> ListOfSubData = new Dictionary<string, List<string>>();
-        public DataManager(string location)
+        public DataManager(string _location)
         {
-            this._location = location;
+            this._location = _location;
         }
-        public string[] ReadLine(string name, string SubAddress)
+        public string[] ReadLine(string name, string subAddress)
         {
 
             var imsi = new List<string>();
@@ -30,7 +30,7 @@ namespace FileDataInputOutput
                         while ((current = reader.ReadLine()) != null)
                         {
                             if (current.StartsWith("") && current.EndsWith(":")) break;
-                            if (current.Equals("\t-" + SubAddress))
+                            if (current.Equals("\t-" + subAddress))
                             {
                                 while ((current = reader.ReadLine()) != null)
                                 {

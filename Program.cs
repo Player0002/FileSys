@@ -6,7 +6,7 @@ namespace FileDataInputOutput
 {
     class FileData
     {
-        private readonly string LOC = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FileD.dat";
+        private readonly string _loc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FileD.dat";
 
         private readonly DataManager _dataManager;
         /*
@@ -14,8 +14,8 @@ namespace FileDataInputOutput
          */
         public FileData()
         {
-            if(!File.Exists(LOC)) File.Create(LOC).Close();
-            _dataManager = new DataManager(LOC);
+            if(!File.Exists(_loc)) File.Create(_loc).Close();
+            _dataManager = new DataManager(_loc);
         }
 
         public DataManager GetManager()
